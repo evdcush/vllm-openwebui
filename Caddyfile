@@ -1,15 +1,16 @@
 :2080 {
   encode zstd gzip
 
-  # /webui -> strip the prefix (Open WebUI is served at /)
-  handle_path /webui* {
-    reverse_proxy open-webui:8080
-  }
+  # Open WebUI at site root (no prefix stripping needed)
+  reverse_proxy / open-webui:8080
 
-  # /v1 -> DO NOT strip; vLLM expects /v1/...
+  # Keep vLLM OpenAI API at /v1 (do NOT strip the prefix)
   handle /v1* {
     reverse_proxy vllm:8000
   }
 
-  respond / "ok - caddy up" 200
+  # Optional: keep your Homepage at /home (strip prefix)
+  handle_path /home* {
+    reverse_proxy 127.0.0.1:80
+  }
 }
