@@ -19,6 +19,7 @@ services:
       --host 0.0.0.0 --port 8000
       --gpu-memory-utilization ${VLLM_GPU_UTIL}
       --dtype auto
+    #--trust-remote-code  # uncomment and include in command to run custom models
     ipc: host
     environment:
       # If you pull gated/private models, set this in .env and uncomment:
