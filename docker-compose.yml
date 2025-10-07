@@ -24,7 +24,6 @@ services:
     environment:
       # If you pull gated/private models, set this in .env and uncomment:
       HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
-      #NVIDIA_VISIBLE_DEVICES: 1
     volumes: *hf_cache
     expose:
         - "8000"
@@ -52,8 +51,6 @@ services:
       # WEBUI_URL: https://YOUR-TS-NAME.ts.net/webui
     volumes:
       - openwebui_data:/app/backend/data
-    #ports:
-    #  - "127.0.0.1:3001:8080"
     expose:
         - "8080"
     networks: [appnet]
