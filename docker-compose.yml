@@ -23,13 +23,8 @@ services:
     environment:
       # If you pull gated/private models, set this in .env and uncomment:
       HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
-      NVIDIA_VISIBLE_DEVICES: 1
-      #FOO: 'ayy'
+      #NVIDIA_VISIBLE_DEVICES: 1
     volumes: *hf_cache
-    #volumes:
-    #  - ./hf-cache:/root/.cache/huggingface
-    #ports:
-    #  - "127.0.0.1:8000:8000"   # for local debugging if needed
     expose:
         - "8000"
     deploy:
@@ -37,8 +32,10 @@ services:
         reservations:
           devices:
             - driver: nvidia
+              #device_ids: ["0", "1"]
+              device_ids: ["1"]
               capabilities: [gpu]
-              count: all
+              #count: all
     networks: [appnet]
     restart: unless-stopped
 
