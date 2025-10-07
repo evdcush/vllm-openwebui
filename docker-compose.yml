@@ -1,0 +1,74 @@
+#version: "3.9"
+name: openwebui-vllm
+
+x-hf-cache: &hf_cache
+  - ./hf-cache:/root/.cache/huggingface
+
+volumes:
+  openwebui_data:
+
+networks:
+  appnet: {}
+
+services:
+  # -------- vLLM (OpenAI-compatible server) --------
+  vllm:
+    image: vllm/vllm-openai:latest
+    command: >
+      --model ${VLLM_MODEL}
+      --host 0.0.0.0 --port 8000
+      --gpu-memory-utilization ${VLLM_GPU_UTIL}
+      --dtype auto
+    ipc: host
+    environment:
+      # If you pull gated/private models, set this in .env and uncomment:
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+      NVIDIA_VISIBLE_DEVICES: 1
+      #FOO: 'ayy'
+    volumes: *hf_cache
+    #volumes:
+    #  - ./hf-cache:/root/.cache/huggingface
+    #ports:
+    #  - "127.0.0.1:8000:8000"   # for local debugging if needed
+    expose:
+        - "8080"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: all
+    networks: [appnet]
+    restart: unless-stopped
+
+  # -------- Open WebUI (frontend) --------
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      # Point Open WebUI to vLLM's OpenAI-compatible API inside the network.
+      OPENAI_API_BASE_URL: http://vllm:8000/v1
+      # Let first signup create an admin (you can disable later in UI).
+      ENABLE_SIGNUP: "true"
+      # Optional tuning knobs; WEBUI_URL is not required unless doing OAuth.
+      # WEBUI_URL: https://YOUR-TS-NAME.ts.net/webui
+    volumes:
+      - openwebui_data:/app/backend/data
+    #ports:
+    #  - "127.0.0.1:3001:8080"
+    expose:
+        - "8080"
+    networks: [appnet]
+    restart: unless-stopped
+
+  # ---------- Caddy (reverse proxy for subpaths) ----------
+  caddy:
+    image: caddy:2
+    depends_on: [open-webui, vllm]
+    networks: [appnet]
+    # Bind to loopback so Tailscale Serve can point to it
+    ports:
+      - "127.0.0.1:2080:2080"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    restart: unless-stopped
