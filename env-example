@@ -1,0 +1,7 @@
+VLLM_MODEL=google/gemma-3-4b-it
+
+# need to provide hf token for gated models n shit
+HF_TOKEN=ayyyy
+
+# gpu ut. START LOWER. you don't want OOMs to add more dimensionality to problems.
+VLLM_GPU_UTIL=0.85
