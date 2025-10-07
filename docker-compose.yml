@@ -31,7 +31,7 @@ services:
     #ports:
     #  - "127.0.0.1:8000:8000"   # for local debugging if needed
     expose:
-        - "8080"
+        - "8000"
     deploy:
       resources:
         reservations:

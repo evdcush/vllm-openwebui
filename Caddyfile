@@ -1,16 +1,15 @@
 :2080 {
   encode zstd gzip
 
-  # /webui -> Open WebUI (Caddy strips the prefix)
+  # /webui -> strip the prefix (Open WebUI is served at /)
   handle_path /webui* {
     reverse_proxy open-webui:8080
   }
 
-  # /v1 -> vLLM OpenAI API (Caddy strips the prefix)
-  handle_path /v1* {
+  # /v1 -> DO NOT strip; vLLM expects /v1/...
+  handle /v1* {
     reverse_proxy vllm:8000
   }
 
-  # simple health check at /
   respond / "ok - caddy up" 200
 }
