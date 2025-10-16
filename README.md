@@ -46,7 +46,7 @@ hell yeah.
 
 Now get tailscale pointed to that sucker:
 ```sh
-tailscale reset
+tailscale serve reset
 tailscale serve --bg --https=443 http://127.0.0.1:2080
 ```
 
