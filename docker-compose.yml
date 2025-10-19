@@ -43,7 +43,7 @@ services:
               capabilities: [gpu]
               #count: all
     networks: [appnet]
-    restart: unless-stopped
+    restart: unless-stopped  # TODO(evan): this means that the model is autoloaded into GPU, ALWAYS, even when not using.
 
   #===============================  Open WebUI  ==============================#
   open-webui:
